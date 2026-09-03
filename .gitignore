@@ -1,0 +1,12 @@
+# Dependencias y compilados
+node_modules/
+dist/
+target/
+
+# Datos locales del prototipo
+legacy/backend/data/db.json
+
+# Entorno
+.env
+*.log
+.DS_Store

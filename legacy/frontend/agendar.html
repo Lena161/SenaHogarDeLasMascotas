@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agendar Cita - Veterinaria El Hogar de Las Mascotas</title>
+  <meta name="description" content="Agenda una cita para tu mascota en Veterinaria El Hogar de Las Mascotas.">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .agendar-hero {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white; text-align: center; padding: 3rem 1.5rem;
+    }
+    .agendar-hero h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 0.5rem; }
+    .agendar-hero p { color: rgba(255,255,255,0.85); }
+
+    .agendar-grid {
+      max-width: 1000px; margin: 2.5rem auto; padding: 0 1.5rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+    }
+    @media (max-width: 800px) { .agendar-grid { grid-template-columns: 1fr; } }
+
+    .panel { background: white; border-radius: 16px; box-shadow: var(--shadow); padding: 1.75rem; }
+    .panel h2 { color: var(--primary); font-size: 1.2rem; margin-bottom: 1rem; }
+
+    .form-cita { display: flex; flex-direction: column; gap: 1rem; }
+    .form-cita label { font-size: 0.85rem; font-weight: 600; color: var(--text); display: block; }
+    .form-cita input, .form-cita select, .form-cita textarea {
+      width: 100%; margin-top: 0.35rem; padding: 0.6rem 0.85rem;
+      border: 1px solid rgba(181, 68, 110, 0.25); border-radius: 8px;
+      font-size: 0.92rem; font-family: inherit;
+    }
+    .form-cita input:focus, .form-cita select:focus, .form-cita textarea:focus {
+      outline: none; border-color: var(--primary);
+    }
+    .form-cita textarea { resize: vertical; min-height: 70px; }
+    .form-row { display: flex; gap: 0.75rem; }
+    .form-row > label { flex: 1; }
+
+    .cita-msg { font-size: 0.85rem; padding: 0.6rem 0.8rem; border-radius: 8px; display: none; }
+    .cita-msg.error { display: block; background: #fdeaea; color: #b3261e; }
+    .cita-msg.success { display: block; background: #e7f7ee; color: #1e7a45; }
+
+    .form-submit {
+      background: var(--primary); color: white; border: none; padding: 0.75rem;
+      border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .form-submit:hover { background: var(--primary-dark); }
+
+    .citas-list { display: flex; flex-direction: column; gap: 0.75rem; max-height: 460px; overflow-y: auto; }
+    .cita-item {
+      border: 1px solid rgba(181, 68, 110, 0.12); border-radius: 10px;
+      padding: 0.85rem 1rem; display: flex; justify-content: space-between;
+      align-items: center; gap: 0.75rem;
+    }
+    .cita-item .info strong { display: block; color: var(--text); font-size: 0.95rem; }
+    .cita-item .info span { color: var(--text-light); font-size: 0.85rem; }
+    .cita-cancel {
+      background: none; border: 1px solid #b3261e; color: #b3261e; border-radius: 8px;
+      padding: 0.35rem 0.7rem; font-size: 0.8rem; cursor: pointer; font-weight: 600;
+      flex-shrink: 0;
+    }
+    .cita-cancel:hover { background: #b3261e; color: white; }
+    .citas-empty { color: var(--text-light); font-size: 0.9rem; text-align: center; padding: 1rem 0; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <a href="index.html" class="logo">🐾 Hogar de Las Mascotas</a>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="productos.html">Productos</a>
+      <a href="servicios.html">Servicios</a>
+      <a href="nosotros.html">Nosotros</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+    <div class="header-actions" id="header-actions">
+      <a href="ingresar.html" class="btn-outline">Ingresar</a>
+      <a href="agendar.html" class="btn-solid active">Agendar Cita</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="agendar-hero">
+      <h1>Agenda la cita de tu mascota</h1>
+      <p>Elige el servicio, la fecha y la hora que mejor te queden.</p>
+    </div>
+
+    <div class="agendar-grid">
+      <div class="panel">
+        <h2>Nueva cita</h2>
+        <form id="form-cita" class="form-cita">
+          <div class="cita-msg" id="cita-msg"></div>
+          <label>Nombre de la mascota
+            <input type="text" name="mascota" required />
+          </label>
+          <label>Servicio
+            <select name="servicio" id="select-servicio" required></select>
+          </label>
+          <div class="form-row">
+            <label>Fecha
+              <input type="date" name="fecha" id="input-fecha" required />
+            </label>
+            <label>Hora
+              <input type="time" name="hora" required />
+            </label>
+          </div>
+          <label>Notas (opcional)
+            <textarea name="notas" placeholder="Cuéntanos algo más sobre tu mascota o el motivo de la visita"></textarea>
+          </label>
+          <button type="submit" class="form-submit">Agendar Cita</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Mis citas</h2>
+        <div id="citas-list" class="citas-list">
+          <p class="citas-empty">Cargando...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <small>&copy; 2026 Veterinaria El Hogar de Las Mascotas. Todos los derechos reservados.</small>
+  </footer>
+
+  <script src="script.js" defer></script>
+  <script>
+    const formCita = document.getElementById('form-cita');
+    const citaMsg = document.getElementById('cita-msg');
+    const citasList = document.getElementById('citas-list');
+    const selectServicio = document.getElementById('select-servicio');
+    const inputFecha = document.getElementById('input-fecha');
+
+    // No permitir agendar en fechas pasadas
+    inputFecha.min = new Date().toISOString().split('T')[0];
+
+    function showMsg(text, type) {
+      citaMsg.textContent = text;
+      citaMsg.className = 'cita-msg ' + type;
+      if (type) setTimeout(() => { citaMsg.className = 'cita-msg'; }, 4000);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    async function verificarSesion() {
+      const res = await fetch('/api/me');
+      const user = await res.json();
+      if (!user) {
+        window.location.href = 'ingresar.html?redirect=agendar.html';
+        return false;
+      }
+      return true;
+    }
+
+    async function cargarServicios() {
+      const res = await fetch('/api/servicios');
+      const servicios = await res.json();
+      selectServicio.innerHTML = servicios
+        .map((s) => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`)
+        .join('');
+    }
+
+    function formatearFecha(fecha, hora) {
+      const [y, m, d] = fecha.split('-');
+      return `${d}/${m}/${y} · ${hora}`;
+    }
+
+    async function cargarCitas() {
+      const res = await fetch('/api/citas');
+      if (!res.ok) return;
+      const citas = await res.json();
+      if (citas.length === 0) {
+        citasList.innerHTML = '<p class="citas-empty">Aún no tienes citas agendadas.</p>';
+        return;
+      }
+      citasList.innerHTML = citas
+        .map(
+          (c) => `
+        <div class="cita-item" data-id="${c.id}">
+          <div class="info">
+            <strong>${escapeHtml(c.mascota)} — ${escapeHtml(c.servicio)}</strong>
+            <span>${formatearFecha(c.fecha, c.hora)}</span>
+          </div>
+          <button class="cita-cancel" data-id="${c.id}">Cancelar</button>
+        </div>`
+        )
+        .join('');
+
+      citasList.querySelectorAll('.cita-cancel').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          await fetch(`/api/citas/${id}`, { method: 'DELETE' });
+          cargarCitas();
+        });
+      });
+    }
+
+    formCita.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(formCita));
+      const res = await fetch('/api/citas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const body = await res.json();
+      if (!res.ok) return showMsg(body.error || 'No se pudo agendar la cita.', 'error');
+      showMsg('¡Cita agendada con éxito!', 'success');
+      formCita.reset();
+      cargarCitas();
+    });
+
+    (async function init() {
+      const ok = await verificarSesion();
+      if (!ok) return;
+      await cargarServicios();
+      await cargarCitas();
+    })();
+  </script>
+</body>
+</html>

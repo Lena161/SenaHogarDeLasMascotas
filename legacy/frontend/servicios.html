@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Servicios - Veterinaria El Hogar de Las Mascotas</title>
+  <meta name="description" content="Conoce todos los servicios veterinarios que ofrecemos: consultas, vacunación, desparasitación, urgencias, baños medicados y spa.">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .services-hero {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
+      text-align: center;
+      padding: 4rem 1.5rem;
+    }
+    .services-hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+    .services-hero p {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.85);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .services-list {
+      max-width: 1000px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .service-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 4px 20px rgba(181,68,110,0.1);
+      border: 1px solid rgba(181,68,110,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(181,68,110,0.18);
+    }
+
+    .service-card .icon-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e8789e, #b5446e);
+      flex-shrink: 0;
+    }
+    .service-card .icon-wrap svg {
+      color: white;
+      width: 28px;
+      height: 28px;
+    }
+
+    .service-card h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2d1b24;
+      margin: 0;
+    }
+    .service-card p {
+      font-size: 0.93rem;
+      color: #7a5566;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .cta-section {
+      background: #fff5f8;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      border-top: 1px solid rgba(181,68,110,0.1);
+    }
+    .cta-section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #b5446e;
+      margin-bottom: 0.5rem;
+    }
+    .cta-section p {
+      color: #7a5566;
+      margin-bottom: 1.5rem;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <a href="index.html" class="logo">🐾 Hogar de Las Mascotas</a>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="productos.html">Productos</a>
+      <a href="servicios.html" class="active">Servicios</a>
+      <a href="nosotros.html">Nosotros</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+    <div class="header-actions" id="header-actions">
+      <a href="ingresar.html" class="btn-outline">Ingresar</a>
+      <a href="agendar.html" class="btn-solid">Agendar Cita</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <div class="services-hero">
+      <h1>Nuestros Servicios</h1>
+      <p>Cuidado profesional e integral para la salud y el bienestar de tu mascota.</p>
+    </div>
+
+    <!-- INTRO -->
+    <div class="intro" style="margin-top:2.5rem;">
+      <p>En <strong>Veterinaria El Hogar de Las Mascotas</strong> contamos con un equipo de profesionales comprometidos con la salud, el bienestar y la felicidad de tu mascota.</p>
+      <p>Ofrecemos una atención cálida, responsable y de alta calidad, desde controles preventivos hasta procedimientos especializados. Aquí encontrarás todo lo que tu compañero necesita en un solo lugar.</p>
+    </div>
+
+    <!-- TARJETAS DE SERVICIOS -->
+    <div class="services-list">
+
+      <!-- Consulta Veterinaria -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M6 4h-1a2 2 0 0 0 -2 2v3.5h0a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1" />
+            <path d="M8 15a6 6 0 1 0 12 0v-3" />
+            <path d="M11 3v2" />
+            <path d="M6 3v2" />
+            <path d="M20 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+          </svg>
+        </div>
+        <h2>Consulta Veterinaria</h2>
+        <p>Evaluación completa del estado de salud de tu mascota a cargo de nuestros veterinarios certificados. Diagnóstico, seguimiento y recomendaciones personalizadas.</p>
+      </div>
+
+      <!-- Vacunación -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M4.5 20.5l4 -4" />
+            <path d="M8.5 16.5l5.5 -5.5" />
+            <path d="M17 3l4 4" />
+            <path d="M17 3l-2 2l1 1l-2 2l-1 -1l-2.5 2.5l3 3l2.5 -2.5l-1 -1l2 -2l1 1l2 -2z" />
+            <path d="M9.5 11.5l3 3" />
+          </svg>
+        </div>
+        <h2>Vacunación</h2>
+        <p>Planes de vacunación preventivos para perros y gatos. Protegemos a tu mascota contra enfermedades infecciosas con los biológicos de mayor calidad.</p>
+      </div>
+
+      <!-- Desparasitación -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M4.5 9.5v-2a2 2 0 0 1 4 0v2" />
+            <path d="M4.5 9.5h4" />
+            <path d="M6.5 9.5v8.5" />
+            <path d="M10 12h2" />
+            <path d="M10 16h2" />
+            <path d="M13.5 9.5a2 2 0 0 1 4 0v2h-4v-2z" />
+            <path d="M13.5 9.5h4" />
+            <path d="M15.5 11.5v7" />
+            <path d="M9 18a1 1 0 0 0 -1 1v1h8v-1a1 1 0 0 0 -1 -1h-6z" />
+          </svg>
+        </div>
+        <h2>Desparasitación</h2>
+        <p>Tratamiento interno y externo contra parásitos como pulgas, garrapatas y helmintos. Mantenemos a tu mascota libre de parasitosis para una vida más saludable.</p>
+      </div>
+
+      <!-- Urgencias no vitales -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+            <path d="M7 10h6" />
+            <path d="M10 7v6" />
+            <path d="M21 21l-6 -6" />
+          </svg>
+        </div>
+        <h2>Atención de Urgencias No Vitales</h2>
+        <p>Atendemos heridas leves, irritaciones, vómito ocasional, cojeras y otros problemas que requieren atención pronta pero no representan riesgo inmediato de vida.</p>
+      </div>
+
+      <!-- Baños Medicados -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M6 20h-2a2 2 0 0 1 -2 -2v-6h20v6a2 2 0 0 1 -2 2h-2" />
+            <path d="M8 20h8" />
+            <path d="M2 12v-5a2 2 0 0 1 2 -2h1v-1a1 1 0 0 1 2 0v1h6v-1a1 1 0 0 1 2 0v1h1a2 2 0 0 1 2 2v5" />
+          </svg>
+        </div>
+        <h2>Baños Medicados</h2>
+        <p>Tratamientos dermatológicos con champús y productos terapéuticos para el control de hongos, bacterias, sarna y otras afecciones cutáneas de tu mascota.</p>
+      </div>
+
+      <!-- Spa y Peluquería -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M6 7m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+            <path d="M6 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+            <path d="M8.6 8.6l10.4 10.4" />
+            <path d="M8.6 15.4l10.4 -10.4" />
+          </svg>
+        </div>
+        <h2>Spa y Peluquería</h2>
+        <p>Baño, secado, corte de pelo, limpieza de oídos, corte de uñas y más. Dejamos a tu mascota limpia, cómoda y con una apariencia impecable.</p>
+      </div>
+
+
+      <!-- Cirugías de Esterilización -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M8 21l8 0" />
+            <path d="M12 17l0 4" />
+            <path d="M7 4l0 4" />
+            <path d="M17 4l0 4" />
+            <path d="M6 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v1a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
+            <path d="M12 13l0 4" />
+          </svg>
+        </div>
+        <h2>Cirugías de Esterilización</h2>
+        <p>Realizamos procedimientos de castración y esterilización para caninos y felinos con anestesia segura, monitoreo constante y recuperación acompañada.</p>
+      </div>
+
+      <!-- Profilaxis -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 5.5m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0" />
+            <path d="M7 14.5c0 -2.5 2.239 -4.5 5 -4.5s5 2 5 4.5" />
+            <path d="M5 21v-1a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v1" />
+            <path d="M9 17l1.5 2l1.5 -2l1.5 2l1.5 -2" />
+          </svg>
+        </div>
+        <h2>Profilaxis Dental</h2>
+        <p>Limpieza dental profesional con ultrasonido para eliminar el sarro y la placa bacteriana. Prevenimos enfermedades periodontales y mejoramos la salud bucal de tu mascota.</p>
+      </div>
+
+      <!-- Exámenes de Laboratorio -->
+      <div class="service-card">
+        <div class="icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M9 3l0 7l-4.5 7.5a1 1 0 0 0 .9 1.5h13.2a1 1 0 0 0 .9 -1.5l-4.5 -7.5v-7" />
+            <path d="M6.5 3h11" />
+            <path d="M10 14l1.5 -1.5l1.5 1.5l1.5 -1.5" />
+          </svg>
+        </div>
+        <h2>Exámenes de Laboratorio</h2>
+        <p>Hemogramas, uroanálisis, coprologías, química sanguínea y más. Resultados precisos y rápidos para apoyar el diagnóstico y seguimiento clínico de tu mascota.</p>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h2>¿Listo para agendar?</h2>
+      <p>Reserva una cita o contáctanos directamente por WhatsApp.</p>
+      <div class="cta-buttons">
+        <a href="agendar.html" class="btn-solid" style="padding:0.75rem 2rem; border-radius:50px; text-decoration:none; font-weight:700; font-size:1rem;">Agendar Cita</a>
+        <a href="whatsapp://send?phone=+573042083475&text=Hola%20me%20interesa%20saber%20m%C3%A1s%20sobre%20sus%20servicios" target="_blank" class="whatsapp-btn">💬 WhatsApp</a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <small>&copy; 2026 Veterinaria El Hogar de Las Mascotas. Todos los derechos reservados.</small>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
