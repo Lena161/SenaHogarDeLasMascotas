@@ -189,6 +189,14 @@ trazabilidad hacia el diseño.
 | RN-05 | Una salida de inventario no puede superar el stock disponible |
 | RN-06 | Una cita CANCELADA o ATENDIDA no puede modificarse |
 | RN-07 | El historial clínico solo puede ser creado y editado por veterinarios |
+| RN-08 | Una mascota no puede tener dos citas cuyos intervalos de tiempo se crucen, aunque sean de servicios distintos y con profesionales distintos |
+| RN-09 | La duración registrada de cada servicio debe corresponder al tiempo real de ocupación del recurso, ya que es la base del cálculo de solapamiento (RN-02 y RN-08) |
+
+> **Nota de trazabilidad:** las reglas RN-08 y RN-09 no formaban parte de la
+> versión 1.0 de este documento. Fueron identificadas durante las pruebas
+> funcionales de la Fase 5 y se incorporan aquí en la versión 1.1. El
+> proceso completo se documenta en el anexo *Hallazgos de pruebas
+> funcionales* (`docs/hallazgos_pruebas_funcionales.md`).
 
 ---
 
@@ -829,4 +837,5 @@ sección 2.3.
 | Versión | Fecha | Autor | Cambios |
 |---------|-------|-------|---------|
 | 1.0 | Agosto 2026 | [Nombre del aprendiz] | Versión inicial para revisión de instructores |
+| 1.1 | Septiembre 2026 | [Nombre del aprendiz] | Se incorporan RN-08 y RN-09, derivadas de las pruebas funcionales de la Fase 5 |
 

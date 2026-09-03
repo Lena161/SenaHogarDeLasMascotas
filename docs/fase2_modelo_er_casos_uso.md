@@ -585,6 +585,8 @@ el resultado en tabla y gráfico, con opción de exportar.
 | RF-14 | Tabla `usuario` (hash BCrypt, ENUM de roles, exclusividad empleado/dueño) |
 | RF-19 | Vista `v_servicios_mas_solicitados` + consultas de verificación |
 | RN-02 | `UNIQUE(empleado_id, fecha_hora)` (parcial) + capa de servicio (Fase 3) |
+| RN-08 | Capa de servicio (agregada en la Fase 5; ver anexo de hallazgos) |
+| RN-09 | Columna `servicio.duracion_minutos` + script `ajuste_duraciones.sql` |
 | RN-03 | FK `mascota.dueno_id NOT NULL` con RESTRICT |
 | RN-05 | Trigger BEFORE INSERT con `SIGNAL` y `FOR UPDATE` |
 | RN-06 | ENUM de estados; transiciones controladas en servicio (Fase 3) |
@@ -605,3 +607,4 @@ las reglas de negocio según la restricción de diseño de la Fase 1 (§6.3).
 | Versión | Fecha | Autor | Cambios |
 |---------|-------|-------|---------|
 | 1.0 | Agosto 2026 | [Nombre del aprendiz] | Modelo E-R, script validado y casos de uso UC01–UC14 |
+| 1.1 | Septiembre 2026 | [Nombre del aprendiz] | Trazabilidad de RN-08 y RN-09 tras las pruebas funcionales |

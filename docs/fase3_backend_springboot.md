@@ -113,6 +113,13 @@ parametrizables.
 responsable; el stock solo cambia vía `aplicar()`; la BD lo garantiza en
 paralelo con sus triggers.
 
+**RN-08 (agregada en la Fase 5).** Además de la agenda del profesional, se
+verifica la agenda de la **mascota**: un mismo paciente no puede tener citas
+solapadas aunque las atiendan profesionales distintos. Reutiliza la misma
+verificación de intervalos de RN-02 sobre una consulta distinta. Su origen
+—un hallazgo de las pruebas funcionales— se documenta en
+`docs/hallazgos_pruebas_funcionales.md`.
+
 ## 6. SEGURIDAD (RF-14, RNF-03, RNF-04)
 
 Sesiones de cookie del prototipo → **JWT sin estado** (HS256, 8 horas),
@@ -168,3 +175,4 @@ tráelo y lo corregimos — forma parte normal del ciclo.
 | Versión | Fecha | Autor | Cambios |
 |---------|-------|-------|---------|
 | 1.0 | Agosto 2026 | [Nombre del aprendiz] | Backend Spring Boot completo |
+| 1.1 | Septiembre 2026 | [Nombre del aprendiz] | Implementación de RN-08; correcciones de la revisión de código |
