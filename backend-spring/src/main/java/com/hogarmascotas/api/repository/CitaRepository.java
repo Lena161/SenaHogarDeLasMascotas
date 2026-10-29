@@ -25,4 +25,15 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     /** Citas de todas las mascotas de un dueno (para "Mis citas"). */
     List<Cita> findByMascotaDuenoIdOrderByFechaHoraAsc(Long duenoId);
+
+    /** RF-08: agenda completa de la clinica en una ventana de tiempo. */
+    List<Cita> findByFechaHoraBetweenOrderByFechaHoraAsc(
+            LocalDateTime desde, LocalDateTime hasta);
+
+    /** RF-08: agenda de un profesional en una ventana de tiempo. */
+    List<Cita> findByEmpleadoIdAndFechaHoraBetweenOrderByFechaHoraAsc(
+            Long empleadoId, LocalDateTime desde, LocalDateTime hasta);
+
+    /** Historial de citas de una mascota (ficha del paciente, RF-03). */
+    List<Cita> findByMascotaIdOrderByFechaHoraDesc(Long mascotaId);
 }

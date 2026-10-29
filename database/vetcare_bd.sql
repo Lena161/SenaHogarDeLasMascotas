@@ -227,6 +227,76 @@ CREATE TABLE movimiento_inventario (
 CREATE INDEX idx_mov_producto ON movimiento_inventario (producto_id);
 CREATE INDEX idx_mov_fecha    ON movimiento_inventario (fecha);
 
+-- ---------------------------------------------------------------------------
+-- Historia clinica (RF-09, RF-10)
+--
+-- REVISION DE LA DECISION DE LA FASE 1: alli se propuso alojar el historial
+-- en una base documental. Al implementarlo se verifico que el registro tiene
+-- estructura fija, volumen bajo y tres relaciones fuertes (mascota, cita y
+-- veterinario). Separarlo en otro motor obligaria a sostener la integridad
+-- referencial por codigo, sin ninguna ganancia a cambio. Se implementa
+-- relacional y la decision queda documentada como cambio de alcance.
+-- ---------------------------------------------------------------------------
+CREATE TABLE historial_clinico (
+    id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    mascota_id        BIGINT UNSIGNED NOT NULL,
+    cita_id           BIGINT UNSIGNED NULL,
+    veterinario_id    BIGINT UNSIGNED NOT NULL,
+    fecha             DATETIME     NOT NULL,
+
+    -- Anamnesis
+    motivo            VARCHAR(255)  NOT NULL,
+    anamnesis         VARCHAR(1000) NULL,
+
+    -- Constantes vitales. Van en columnas propias y no dentro del texto
+    -- del examen porque su valor esta en poder compararlas entre
+    -- consultas: un peso o una temperatura solo significan algo frente
+    -- a los de la vez anterior. Eso exige que sean dato, no prosa.
+    temperatura_c           DOUBLE NULL,
+    frecuencia_cardiaca     INT    NULL,
+    frecuencia_respiratoria INT    NULL,
+    peso_kg                 DOUBLE NULL,
+    condicion_corporal      INT    NULL,
+
+    -- Examen, diagnostico y plan terapeutico
+    examen_fisico     VARCHAR(1000) NULL,
+    diagnostico       VARCHAR(500)  NOT NULL,
+    tratamiento       VARCHAR(500)  NULL,
+    medicamentos      VARCHAR(500)  NULL,
+    vacunas_aplicadas VARCHAR(255)  NULL,
+    desparasitacion   VARCHAR(255)  NULL,
+    proximo_control   DATE          NULL,
+    observaciones     VARCHAR(500)  NULL,
+
+    -- Una cita genera a lo sumo un registro clinico
+    CONSTRAINT uk_historial_cita UNIQUE (cita_id),
+
+    CONSTRAINT fk_historial_mascota FOREIGN KEY (mascota_id)
+        REFERENCES mascota (id)  ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_historial_cita FOREIGN KEY (cita_id)
+        REFERENCES cita (id)     ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_historial_vet FOREIGN KEY (veterinario_id)
+        REFERENCES empleado (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+    -- Rangos plausibles. Son amplios a proposito: no les corresponde
+    -- decidir si un valor es normal para la especie, solo impedir que
+    -- un error de digitacion entre a la historia como dato clinico.
+    CONSTRAINT chk_historial_peso CHECK (peso_kg IS NULL OR peso_kg > 0),
+    CONSTRAINT chk_historial_temperatura
+        CHECK (temperatura_c IS NULL OR (temperatura_c BETWEEN 25 AND 45)),
+    CONSTRAINT chk_historial_fc
+        CHECK (frecuencia_cardiaca IS NULL OR (frecuencia_cardiaca BETWEEN 10 AND 400)),
+    CONSTRAINT chk_historial_fr
+        CHECK (frecuencia_respiratoria IS NULL OR (frecuencia_respiratoria BETWEEN 5 AND 200)),
+    CONSTRAINT chk_historial_condicion
+        CHECK (condicion_corporal IS NULL OR (condicion_corporal BETWEEN 1 AND 5)),
+
+    -- La consulta mas frecuente es "el historial de este paciente,
+    -- del mas reciente al mas antiguo" (RF-10).
+    KEY idx_historial_mascota_fecha (mascota_id, fecha)
+) ENGINE = InnoDB
+  COMMENT = 'Historia clinica por atencion (RF-09, RF-10)';
+
 -- ============================================================================
 -- 3. TRIGGERS: integridad del stock (RN-05, RNF-08)
 --    Defensa en profundidad: la capa de servicio valida primero, pero la BD
@@ -331,20 +401,27 @@ INSERT INTO dueno (tipo_documento, numero_documento, nombres, apellidos,
 INSERT INTO empleado (tipo_documento, numero_documento, nombres, apellidos,
                       telefono, correo, rol, tarjeta_profesional,
                       especialidad, certificacion) VALUES
-('CC','71234567','Marta','Restrepo Lopez','3105551111','marta.restrepo@vetcare.com','ADMIN',NULL,NULL,NULL),
-('CC','71345678','Julian','Osorio Cano','3105552222','julian.osorio@vetcare.com','RECEPCION',NULL,NULL,NULL),
-('CC','71456789','Andres','Zapata Ruiz','3105553333','andres.zapata@vetcare.com','VETERINARIO','TP-2019-4432','Medicina general',NULL),
-('CC','71567890','Sofia','Cardona Vega','3105554444','sofia.cardona@vetcare.com','VETERINARIO','TP-2021-8810','Dermatologia',NULL),
-('CC','71678901','Paula','Mejia Arango','3105555555','paula.mejia@vetcare.com','ESTETICISTA',NULL,NULL,'Groomer certificada ABC');
+-- Personal real de la clinica. El equipo son tres personas; el rol
+-- RECEPCION permanece en el modelo para un crecimiento futuro, pero
+-- hoy no tiene titular y la administradora asume esas funciones.
+-- REVISAR antes de usar en produccion: documentos, telefonos, correos
+-- y numero de tarjeta profesional.
+('CC','00000003','Milena','Pajaro','3042083475','milena.pajaro@hogardelasmascotas.com','ADMIN',NULL,NULL,NULL),
+('CC','00000001','Arlin','Gaviria','3042083475','arlin.gaviria@hogardelasmascotas.com','VETERINARIO','REVISAR-TP','Medicina general',NULL),
+('CC','00000002','Candelaria','Silgado','3042083475','candelaria.silgado@hogardelasmascotas.com','ESTETICISTA',NULL,NULL,'Peluqueria canina y felina');
 
 INSERT INTO servicio (nombre, tipo, descripcion, duracion_minutos,
                       precio_base, recargo_por_tamano) VALUES
 ('Consulta general','CONSULTA','Valoracion medica general',30,60000,0),
 ('Consulta dermatologica','CONSULTA','Valoracion de piel y pelaje',40,85000,0),
 ('Vacunacion','CONSULTA','Aplicacion de biologicos',20,45000,0),
-('Bano medicado','SPA','Bano con shampoo dermatologico',45,40000,10000),
-('Bano y peluqueria','SPA','Bano completo mas corte de pelo',60,55000,15000),
-('Corte de unas','SPA','Corte y limado de unas',15,15000,0);
+-- RN-09: la duracion es el tiempo REAL que la mascota ocupa el espacio,
+-- no el de la atencion efectiva. Es el insumo del calculo de solapamiento:
+-- subestimarla libera la agenda antes de tiempo. Los valores originales
+-- (45, 60 y 15 minutos) se corrigieron tras las pruebas funcionales.
+('Bano medicado','SPA','Bano con shampoo dermatologico',90,40000,10000),
+('Bano y peluqueria','SPA','Bano completo mas corte de pelo',120,55000,15000),
+('Corte de unas','SPA','Corte y limado de unas',30,15000,0);
 
 INSERT INTO producto (nombre, categoria, descripcion, precio,
                       stock_actual, stock_minimo) VALUES
@@ -356,11 +433,18 @@ INSERT INTO producto (nombre, categoria, descripcion, precio,
 ('Jeringas 5ml x100','INSUMO','Caja de jeringas desechables',28000,0,2);
 
 INSERT INTO usuario (username, password_hash, rol, empleado_id, dueno_id) VALUES
--- Hash BCrypt de ejemplo (la app generara los reales): "Password123*"
-('admin',   '$2a$10$abcdefghijklmnopqrstuvICKq0DpRrDGVcpOXHk3sYqWm9r0hBz2', 'ADMIN',       1, NULL),
-('recepcion','$2a$10$abcdefghijklmnopqrstuvICKq0DpRrDGVcpOXHk3sYqWm9r0hBz2','RECEPCION',   2, NULL),
-('avet',    '$2a$10$abcdefghijklmnopqrstuvICKq0DpRrDGVcpOXHk3sYqWm9r0hBz2', 'VETERINARIO', 3, NULL),
-('laura',   '$2a$10$abcdefghijklmnopqrstuvICKq0DpRrDGVcpOXHk3sYqWm9r0hBz2', 'CLIENTE',  NULL, 1);
+-- El correo ES el nombre de usuario: el formulario web valida ese campo
+-- como correo y AuthService registra a los clientes con el suyo, de modo
+-- que el criterio queda uniforme para todos los perfiles.
+--
+-- El hash corresponde realmente a la contrasena "Clave123*" (BCrypt,
+-- coste 10). La version anterior de este script traia un hash de relleno
+-- que no correspondia a ninguna contrasena, y por eso esas cuentas nunca
+-- pudieron iniciar sesion: fue un defecto detectado en las pruebas.
+('milena.pajaro@hogardelasmascotas.com',     '$2b$10$sZ5p3.ULT.Sdqhnu1qJbXuL.bdQDePTy2Fz2RaQQcYS1BVogeGF4O', 'ADMIN',       1, NULL),
+('arlin.gaviria@hogardelasmascotas.com',     '$2b$10$sZ5p3.ULT.Sdqhnu1qJbXuL.bdQDePTy2Fz2RaQQcYS1BVogeGF4O', 'VETERINARIO', 2, NULL),
+('candelaria.silgado@hogardelasmascotas.com','$2b$10$sZ5p3.ULT.Sdqhnu1qJbXuL.bdQDePTy2Fz2RaQQcYS1BVogeGF4O', 'ESTETICISTA', 3, NULL),
+('laura.gomez@mail.com',                     '$2b$10$sZ5p3.ULT.Sdqhnu1qJbXuL.bdQDePTy2Fz2RaQQcYS1BVogeGF4O', 'CLIENTE',  NULL, 1);
 
 INSERT INTO mascota (dueno_id, nombre, especie, raza, fecha_nacimiento,
                      sexo, peso_kg, tamano) VALUES
@@ -388,11 +472,37 @@ INSERT INTO movimiento_inventario (producto_id, usuario_id, tipo, cantidad,
 -- Citas de ejemplo
 INSERT INTO cita (mascota_id, servicio_id, empleado_id, fecha_hora,
                   estado, precio_final, observaciones) VALUES
-(1, 1, 3, '2026-08-14 09:00:00', 'CONFIRMADA', 60000, 'Chequeo anual'),
-(2, 3, 4, '2026-08-14 10:00:00', 'PENDIENTE',  45000, 'Refuerzo triple felina'),
-(3, 5, 5, '2026-08-14 11:00:00', 'CONFIRMADA', 70000, 'Bano y corte, talla M: 55000 + 15000'),
-(4, 4, 5, '2026-08-15 09:30:00', 'PENDIENTE',  40000, NULL),
-(1, 1, 3, '2026-08-10 09:00:00', 'ATENDIDA',   60000, 'Cita historica atendida');
+-- Empleado 2 = Arlin (veterinaria), empleado 3 = Candelaria (esteticista).
+-- RN-04 se cumple: las consultas y vacunaciones las atiende la veterinaria
+-- y los servicios de spa, la esteticista.
+(1, 1, 2, '2026-08-14 09:00:00', 'CONFIRMADA', 60000, 'Chequeo anual'),
+(2, 3, 2, '2026-08-14 10:00:00', 'PENDIENTE',  45000, 'Refuerzo triple felina'),
+(3, 5, 3, '2026-08-14 11:00:00', 'CONFIRMADA', 70000, 'Bano y corte, talla M: 55000 + 15000'),
+(4, 4, 3, '2026-08-15 09:30:00', 'PENDIENTE',  40000, NULL),
+(1, 1, 2, '2026-08-10 09:00:00', 'ATENDIDA',   60000, 'Cita historica atendida');
+
+-- Historia clinica de la cita ya atendida (RF-09, RF-10): permite
+-- demostrar la consulta del historial sin tener que atender una cita
+-- primero. La cita 5 es la ATENDIDA de Rocky con la veterinaria.
+INSERT INTO historial_clinico (mascota_id, cita_id, veterinario_id, fecha,
+                               motivo, anamnesis, temperatura_c,
+                               frecuencia_cardiaca, frecuencia_respiratoria,
+                               peso_kg, condicion_corporal, examen_fisico,
+                               diagnostico, tratamiento, medicamentos,
+                               vacunas_aplicadas, desparasitacion,
+                               proximo_control, observaciones) VALUES
+(1, 5, 2, '2026-08-10 09:00:00',
+ 'Chequeo anual',
+ 'El propietario refiere que el paciente se encuentra activo, con apetito normal y sin cambios de comportamiento. Asiste a control anual de rutina.',
+ 38.4, 92, 24, 28.50, 3,
+ 'Mucosas rosadas y humedas, tiempo de llenado capilar menor a dos segundos. Auscultacion cardiopulmonar sin hallazgos. Palpacion abdominal no dolorosa. Piel y pelaje en buen estado. Dentadura con sarro leve.',
+ 'Paciente clinicamente sano. Se observa sarro dental leve.',
+ 'Profilaxis dental sugerida para el proximo semestre',
+ 'No se prescriben medicamentos',
+ 'Refuerzo quintuple canina',
+ 'Antiparasitario oral de amplio espectro, dosis unica',
+ '2027-02-10',
+ 'Propietario informado sobre higiene dental en casa');
 
 -- ============================================================================
 -- 6. CONSULTAS DE VERIFICACION (usar en la sustentacion)

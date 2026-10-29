@@ -1,69 +1,124 @@
-// Migración de index.html: hero con imagen, buscador, intro y
-// tarjetas de servicios destacados. Contenidos conservados 1:1.
+// Portada del sitio.
+// Rediseño: en vez de una foto a todo lo ancho con el texto encima
+// (el patrón que traía el código base), la portada se abre en dos
+// columnas: el mensaje y las acciones a la izquierda, la foto a la
+// derecha recortada en ARCO —una puerta abierta—, que es el motivo
+// visual tomado del propio nombre de la marca: "El Hogar".
 import { Link, useNavigate } from 'react-router-dom';
-import { IconoConsulta, IconoSpa, IconoTienda, IconoVacuna, IconoBusqueda } from '../components/Iconos';
-import { enlaceWhatsApp } from '../data/negocio';
+import {
+  IconoConsulta, IconoSpa, IconoTienda, IconoVacuna, IconoBusqueda, IconoWhatsApp
+} from '../components/Iconos';
+import { DIRECCION, HORARIO, enlaceWhatsApp } from '../data/negocio';
 
 const DESTACADOS = [
-  { icono: <IconoConsulta />, titulo: 'Consultas Veterinarias', texto: 'Cuidado experto para la salud y el bienestar de tus mascotas.' },
-  { icono: <IconoSpa />, titulo: 'Spa y Peluquería', texto: 'Servicios profesionales para que tu mascota luzca increíble.' },
-  { icono: <IconoTienda />, titulo: 'Tienda Online', texto: 'Una amplia gama de productos de calidad para tu compañero.' },
-  { icono: <IconoVacuna />, titulo: 'Cotizar Cirugías o Examenes de Laboratorio', texto: 'Solicita una cotización para cirugías o exámenes de laboratorio.' }
+  {
+    icono: <IconoConsulta />,
+    titulo: 'Consulta veterinaria',
+    texto: 'Valoración, diagnóstico y seguimiento con veterinarios certificados.',
+    a: '/servicios'
+  },
+  {
+    icono: <IconoVacuna />,
+    titulo: 'Vacunación y prevención',
+    texto: 'Planes de vacunación y desparasitación al día para perros y gatos.',
+    a: '/servicios'
+  },
+  {
+    icono: <IconoSpa />,
+    titulo: 'Spa y peluquería',
+    texto: 'Baño, corte, limpieza de oídos y uñas. Tu mascota sale como nueva.',
+    a: '/servicios'
+  },
+  {
+    icono: <IconoTienda />,
+    titulo: 'Tienda',
+    texto: 'Alimento, accesorios e higiene con el precio y el stock del día.',
+    a: '/productos'
+  }
 ];
 
 export default function Inicio() {
   const navegar = useNavigate();
 
   function manejarBusqueda(e) {
-    // Decisión documentada en el plan de migración (§6.2): el buscador
-    // era decorativo en el código base; ahora lleva a la página de
-    // productos (cuando el catálogo venga de la API, se pasará el
-    // término como filtro).
     e.preventDefault();
     navegar('/productos');
   }
 
   return (
     <main>
-      <div className="hero-banner">
-        <img src="/img/Imgjscam1.jpg" alt="Veterinaria El Hogar de Las Mascotas" />
-        <div className="hero-overlay">
-          <h1>Veterinaria El Hogar de Las Mascotas</h1>
-          <p>Cuidamos a tus amigos peludos con amor y profesionalismo.</p>
-          <Link to="/agendar" className="btn-hero">Agendar Cita</Link>
+      {/* ── PORTADA ── */}
+      <section className="portada">
+        <div className="portada-texto">
+          <h1>Tu mascota ya tiene un hogar aquí</h1>
+          <p className="entrada">
+            Clínica veterinaria y spa en Itagüí. Atendemos consulta, vacunación,
+            cirugía y estética, y puedes reservar tu cita en línea en menos de un minuto.
+          </p>
+
+          <div className="portada-acciones">
+            <Link to="/agendar" className="btn-miel">Agendar cita</Link>
+            <Link to="/servicios" className="btn-linea">Ver servicios</Link>
+          </div>
+
+          <dl className="portada-datos">
+            <div>
+              <dt>Horario</dt>
+              <dd>{HORARIO}</dd>
+            </div>
+            <div>
+              <dt>Dónde estamos</dt>
+              <dd>{DIRECCION}</dd>
+            </div>
+          </dl>
         </div>
-      </div>
 
-      <form role="search" className="search-bar" onSubmit={manejarBusqueda}>
-        <IconoBusqueda />
-        <input required type="text" placeholder="Buscar productos..." />
-        <button type="submit">Buscar</button>
-      </form>
+        <div className="portada-arco">
+          <img src="/img/Imgjscam1.jpg" alt="Cachorro corriendo por un sendero" />
+        </div>
+      </section>
 
-      <div className="intro">
-        <p>En Veterinaria El Hogar de Las Mascotas nos dedicamos a brindar el mejor cuidado para tus amigos peludos. Nuestro equipo de profesionales está comprometido con la salud y el bienestar de tus mascotas.</p>
-        <p>Consultas de rutina, vacunaciones, tratamientos especializados y productos de alta calidad, todo en un solo lugar.</p>
-      </div>
-
+      {/* ── CÓMO TE AYUDAMOS ── */}
       <section className="services-section">
         <div className="section-header">
           <h2>Cuidado completo para tu mejor amigo</h2>
-          <p>Productos, servicios veterinarios y spa. Todo lo que tu mascota necesita.</p>
+          <p>
+            Lo que atendemos todos los días, de la consulta de rutina al día de spa.
+          </p>
         </div>
 
         <div className="cards-grid">
           {DESTACADOS.map((d) => (
-            <article className="card" key={d.titulo}>
-              <div className="icon-wrap">{d.icono}</div>
-              <h3>{d.titulo}</h3>
-              <p>{d.texto}</p>
-            </article>
+            <Link to={d.a} style={{ textDecoration: 'none' }} key={d.titulo}>
+              <article className="card">
+                <div className="icon-wrap">{d.icono}</div>
+                <h3>{d.titulo}</h3>
+                <p>{d.texto}</p>
+              </article>
+            </Link>
           ))}
         </div>
 
-        <div style={{ textAlign: 'center' }}>
-          <a href={enlaceWhatsApp('Hola me interesa saber más sobre sus servicios')} target="_blank" rel="noreferrer" className="whatsapp-btn">
-            💬 Contactar por WhatsApp
+        <form role="search" className="search-bar" onSubmit={manejarBusqueda} style={{ marginTop: '2.5rem' }}>
+          <IconoBusqueda />
+          <input required type="text" placeholder="Buscar en la tienda: alimento, antipulgas…" />
+          <button type="submit">Buscar</button>
+        </form>
+      </section>
+
+      {/* ── CITA ── */}
+      <section className="cta-section">
+        <h2>Reserva en línea, sin llamadas</h2>
+        <p>Eliges servicio, profesional y horario. Te confirmamos la cita el mismo día.</p>
+        <div className="cta-buttons">
+          <Link to="/agendar" className="btn-miel">Agendar cita</Link>
+          <a
+            href={enlaceWhatsApp('Hola, quiero saber más sobre sus servicios')}
+            target="_blank"
+            rel="noreferrer"
+            className="whatsapp-btn"
+          >
+            <IconoWhatsApp /> Escribir por WhatsApp
           </a>
         </div>
       </section>

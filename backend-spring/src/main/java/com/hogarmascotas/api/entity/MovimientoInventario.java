@@ -42,6 +42,13 @@ public abstract class MovimientoInventario {
     /** POLIMORFISMO: cada subtipo define su efecto sobre el stock. */
     public abstract void aplicar(Producto producto);
 
+    /**
+     * Cada subtipo declara su nombre, igual que Empleado declara su rol.
+     * Permite mostrar el tipo sin consultar la columna discriminadora ni
+     * preguntar por la clase con instanceof.
+     */
+    public abstract String getTipo();
+
     public Long getId() { return id; }
     public Producto getProducto() { return producto; }
     public void setProducto(Producto producto) { this.producto = producto; }

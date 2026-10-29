@@ -29,7 +29,15 @@ public class ServicioSpa extends Servicio {
     @Override
     public boolean puedeSerAtendidoPor(Empleado empleado) {
         // RN-04: solo una esteticista puede atender un servicio de spa.
-        return empleado instanceof Esteticista;
+        // Mismo criterio que en ConsultaVeterinaria: se pregunta el rol
+        // que el objeto declara, no su clase.
+        return "ESTETICISTA".equals(empleado.getRol());
+    }
+
+    @Override
+    public boolean requiereHistorialClinico() {
+        // Un servicio de estetica no produce diagnostico medico.
+        return false;
     }
 
     public BigDecimal getRecargoPorTamano() { return recargoPorTamano; }

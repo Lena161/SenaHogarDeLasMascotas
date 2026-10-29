@@ -1,12 +1,14 @@
-// Antes: cinco héroes casi idénticos (services-hero, contacto-hero,
-// nosotros-hero, productos-hero, agendar-hero), uno por página.
-// Ahora: un componente parametrizado que conserva el mismo gradiente
-// y tipografía de la versión original.
+// Encabezado de las páginas interiores.
+// Rediseño: fondo verde profundo con un arco insinuado al fondo —el
+// motivo de la marca— y el texto alineado a la izquierda, no centrado,
+// para que la lectura empiece donde empieza el resto de la página.
 export default function Hero({ titulo, subtitulo, compacto = false }) {
   return (
     <div className={`page-hero${compacto ? ' compact' : ''}`}>
-      <h1>{titulo}</h1>
-      {subtitulo && <p>{subtitulo}</p>}
+      <div className="interior">
+        <h1>{titulo}</h1>
+        {subtitulo && <p>{subtitulo}</p>}
+      </div>
     </div>
   );
 }

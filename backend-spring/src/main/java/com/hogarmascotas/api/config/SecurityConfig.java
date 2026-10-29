@@ -41,9 +41,12 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/registro", "/api/v1/auth/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/servicios/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/productos/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/empleados/**").permitAll()
+                // Solo el catalogo en si es publico. Las rutas de gestion que
+                // cuelgan de estos prefijos (por-reponer, movimientos) quedan
+                // fuera a proposito: antes el comodin /** las alcanzaba.
+                .requestMatchers(HttpMethod.GET, "/api/v1/servicios").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/productos").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/empleados").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/contacto").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
@@ -53,7 +56,12 @@ public class SecurityConfig {
     /** CORS para el frontend React (dev server de Vite). */
     private CorsConfigurationSource configuracionCors() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        // Se admiten los dos puertos que usa Vite: si el 5173 esta ocupado
+        // por otra instancia, el servidor arranca en el 5174 y el origen
+        // cambia. Antes eso producia un 403 de CORS dificil de diagnosticar.
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173", "http://127.0.0.1:5173",
+                "http://localhost:5174", "http://127.0.0.1:5174"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
         config.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource fuente = new UrlBasedCorsConfigurationSource();

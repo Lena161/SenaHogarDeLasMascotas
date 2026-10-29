@@ -18,6 +18,10 @@ public class AuthDtos {
             @NotBlank String numeroDocumento,
             @NotBlank String telefono,
             @NotBlank @Email String correo,
+            // RF-01 exige la direccion del dueno. Es opcional porque un
+            // cliente puede registrarse solo para agendar, y se completa
+            // despues desde la ficha; la columna existe desde la Fase 2.
+            @Size(max = 150) String direccion,
             @NotBlank @Size(min = 6, message = "La contrasena debe tener al menos 6 caracteres") String password
     ) {}
 

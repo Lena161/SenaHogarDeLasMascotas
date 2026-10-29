@@ -26,13 +26,22 @@ export default function Header() {
         {usuario && usuario.rol === 'CLIENTE' && (
           <NavLink to="/mascotas">Mis Mascotas</NavLink>
         )}
+        {usuario && usuario.rol !== 'CLIENTE' && (
+          <NavLink to="/panel">Panel</NavLink>
+        )}
       </nav>
 
       <div className="header-actions">
         {usuario ? (
           <>
             <span className="user-greeting">Hola, {usuario.nombre.split(' ')[0]}</span>
-            <Link to="/agendar" className="btn-solid">Agendar Cita</Link>
+            {/* Agendar es un recorrido de cliente: el personal usa el panel */}
+            {usuario.rol === 'CLIENTE' && (
+              <Link to="/agendar" className="btn-solid">Agendar Cita</Link>
+            )}
+            {usuario.rol !== 'CLIENTE' && (
+              <Link to="/panel/agenda" className="btn-solid">Ir al panel</Link>
+            )}
             <button type="button" className="btn-outline" onClick={manejarLogout}>
               Cerrar sesión
             </button>

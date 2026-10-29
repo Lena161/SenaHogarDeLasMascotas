@@ -56,4 +56,40 @@ class CitaEstadosTest {
         assertThrows(ReglaNegocioException.class, cita::atender);
         assertThrows(ReglaNegocioException.class, cita::cancelar);
     }
+
+    @Test
+    @DisplayName("RF-07: una cita CONFIRMADA puede marcarse como NO_ASISTIO")
+    void inasistenciaDesdeConfirmada() {
+        Cita cita = new Cita();
+        cita.confirmar();
+
+        cita.marcarInasistencia();
+        assertEquals(Cita.Estado.NO_ASISTIO, cita.getEstado());
+    }
+
+    @Test
+    @DisplayName("RF-07: solo se marca inasistencia sobre una cita CONFIRMADA")
+    void inasistenciaExigeConfirmacion() {
+        // Una cita que nunca se confirmo no puede "no asistirse":
+        // la clinica no reservo el espacio todavia.
+        Cita pendiente = new Cita();
+        assertThrows(ReglaNegocioException.class, pendiente::marcarInasistencia);
+
+        Cita atendida = new Cita();
+        atendida.confirmar();
+        atendida.atender();
+        assertThrows(ReglaNegocioException.class, atendida::marcarInasistencia);
+    }
+
+    @Test
+    @DisplayName("NO_ASISTIO es terminal")
+    void inasistenciaEsTerminal() {
+        Cita cita = new Cita();
+        cita.confirmar();
+        cita.marcarInasistencia();
+
+        assertThrows(ReglaNegocioException.class, cita::atender);
+        assertThrows(ReglaNegocioException.class, cita::cancelar);
+        assertThrows(ReglaNegocioException.class, cita::confirmar);
+    }
 }

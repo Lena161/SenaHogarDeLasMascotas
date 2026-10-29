@@ -19,20 +19,35 @@ public class CitaDtos {
 
     public record CitaResponse(
             Long id,
+            Long mascotaId,
             String mascota,
+            String dueno,
+            String telefonoDueno,
             String servicio,
+            int duracionMinutos,
+            boolean requiereHistorial,
             String profesional,
             LocalDateTime fechaHora,
             String estado,
             BigDecimal precioFinal,
             String observaciones
     ) {
-        /** Fabrica: traduce la entidad al contrato publico. */
+        /**
+         * Fabrica: traduce la entidad al contrato publico.
+         * Los datos del dueno sirven a la agenda de recepcion (RF-08);
+         * un cliente solo recibe por esta via sus propias citas, de modo
+         * que nunca ve el contacto de otro cliente.
+         */
         public static CitaResponse desde(Cita c) {
             return new CitaResponse(
                     c.getId(),
+                    c.getMascota().getId(),
                     c.getMascota().getNombre(),
+                    c.getMascota().getDueno().getNombreCompleto(),
+                    c.getMascota().getDueno().getTelefono(),
                     c.getServicio().getNombre(),
+                    c.getServicio().getDuracionMinutos(),
+                    c.getServicio().requiereHistorialClinico(),
                     c.getEmpleado().getNombreCompleto(),
                     c.getFechaHora(),
                     c.getEstado().name(),

@@ -18,7 +18,7 @@ export default function Ingresar() {
   const [login, setLogin] = useState({ username: '', password: '' });
   const [registro, setRegistro] = useState({
     nombres: '', apellidos: '', numeroDocumento: '',
-    telefono: '', correo: '', password: ''
+    telefono: '', correo: '', direccion: '', password: ''
   });
 
   async function manejarLogin(e) {
@@ -108,6 +108,14 @@ export default function Ingresar() {
               <label>Correo electrónico
                 <input type="email" name="correo" required autoComplete="email"
                        value={registro.correo} onChange={cambioRegistro} />
+              </label>
+              {/* RF-01 pide la dirección del dueño. Es opcional: quien
+                  solo quiere agendar no tiene por qué darla, y se puede
+                  completar después desde la ficha. */}
+              <label>Dirección <span className="opcional">(opcional)</span>
+                <input type="text" name="direccion" autoComplete="street-address"
+                       maxLength={150}
+                       value={registro.direccion} onChange={cambioRegistro} />
               </label>
               <label>Contraseña (mínimo 6 caracteres)
                 <input type="password" name="password" required minLength={6}

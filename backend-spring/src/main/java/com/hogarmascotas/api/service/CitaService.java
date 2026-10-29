@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -182,12 +183,57 @@ public class CitaService {
         return CitaResponse.desde(cita);
     }
 
+    /**
+     * RF-07: el paciente no se presento. Se registra para que la clinica
+     * conozca su tasa de inasistencia; la transicion la valida la entidad.
+     */
     @Transactional
-    public CitaResponse atender(Long citaId) {
+    public CitaResponse marcarInasistencia(Long citaId) {
         Cita cita = citaRepo.findById(citaId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Cita no encontrada."));
-        cita.atender();
+        cita.marcarInasistencia();
         return CitaResponse.desde(cita);
+    }
+
+    /**
+     * RF-08: agenda de la clinica para un dia, usada por recepcion.
+     * Opcionalmente filtrada por estado.
+     */
+    public List<CitaResponse> agendaDelDia(LocalDate fecha, Cita.Estado estado) {
+        return enRango(fecha.atStartOfDay(), fecha.plusDays(1).atStartOfDay(), null, estado);
+    }
+
+    /**
+     * RF-08: agenda propia del profesional. Al tomar el empleado del
+     * usuario autenticado, un profesional no puede consultar la agenda
+     * de otro.
+     */
+    public List<CitaResponse> miAgenda(LocalDate desde, LocalDate hasta, Usuario profesional) {
+        if (profesional.getEmpleado() == null) {
+            throw new ReglaNegocioException(
+                "La cuenta no corresponde a un empleado de la clinica.");
+        }
+        return enRango(desde.atStartOfDay(), hasta.plusDays(1).atStartOfDay(),
+                profesional.getEmpleado().getId(), null);
+    }
+
+    /** Consulta comun a las dos agendas: evita duplicar el filtrado. */
+    private List<CitaResponse> enRango(LocalDateTime desde, LocalDateTime hasta,
+                                       Long empleadoId, Cita.Estado estado) {
+        List<Cita> citas = (empleadoId == null)
+                ? citaRepo.findByFechaHoraBetweenOrderByFechaHoraAsc(desde, hasta)
+                : citaRepo.findByEmpleadoIdAndFechaHoraBetweenOrderByFechaHoraAsc(
+                        empleadoId, desde, hasta);
+        return citas.stream()
+                .filter(c -> estado == null || c.getEstado() == estado)
+                .map(CitaResponse::desde)
+                .toList();
+    }
+
+    /** Citas de una mascota: ficha del paciente para el personal (RF-03). */
+    public List<CitaResponse> deMascota(Long mascotaId) {
+        return citaRepo.findByMascotaIdOrderByFechaHoraDesc(mascotaId)
+                .stream().map(CitaResponse::desde).toList();
     }
 
     private Cita obtenerVisible(Long citaId, Usuario solicitante) {

@@ -22,4 +22,7 @@ public class SalidaInventario extends MovimientoInventario {
 
     public Destino getDestino() { return destino; }
     public void setDestino(Destino destino) { this.destino = destino; }
+
+    @Override
+    public String getTipo() { return "SALIDA"; }
 }

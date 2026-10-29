@@ -49,6 +49,8 @@ public class AuthService {
         dueno.setNumeroDocumento(datos.numeroDocumento().trim());
         dueno.setTelefono(datos.telefono().trim());
         dueno.setCorreo(datos.correo().trim().toLowerCase());
+        dueno.setDireccion(datos.direccion() == null || datos.direccion().isBlank()
+                ? null : datos.direccion().trim()); // RF-01
         duenoRepo.save(dueno);
 
         Usuario usuario = new Usuario();

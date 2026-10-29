@@ -1,6 +1,8 @@
 package com.hogarmascotas.api.service;
 
 import com.hogarmascotas.api.dto.InventarioDtos.MovimientoRequest;
+import com.hogarmascotas.api.dto.InventarioDtos.MovimientoResponse;
+import com.hogarmascotas.api.dto.InventarioDtos.ProductoRequest;
 import com.hogarmascotas.api.dto.InventarioDtos.ProductoResponse;
 import com.hogarmascotas.api.entity.*;
 import com.hogarmascotas.api.exception.RecursoNoEncontradoException;
@@ -32,6 +34,79 @@ public class InventarioService {
     public List<ProductoResponse> listarActivos() {
         return productoRepo.findByActivoTrue().stream()
                 .map(ProductoResponse::desde).toList();
+    }
+
+    /** Vista de administracion: incluye los productos descontinuados. */
+    public List<ProductoResponse> listarTodos() {
+        return productoRepo.findAll().stream()
+                .map(ProductoResponse::desde).toList();
+    }
+
+    /** RF-13: lo que hay que reponer, para armar el pedido al proveedor. */
+    public List<ProductoResponse> porReponer() {
+        return productoRepo.findByActivoTrue().stream()
+                .filter(Producto::requiereReposicion)
+                .map(ProductoResponse::desde).toList();
+    }
+
+    /**
+     * RF-11: alta de producto. Nace con stock en cero a proposito:
+     * la existencia solo entra por un movimiento registrado, de modo
+     * que toda unidad en bodega tiene su respaldo documental.
+     */
+    @Transactional
+    public ProductoResponse crear(ProductoRequest datos) {
+        productoRepo.findByActivoTrue().stream()
+                .filter(p -> p.getNombre().equalsIgnoreCase(datos.nombre().trim()))
+                .findAny()
+                .ifPresent(p -> { throw new ReglaNegocioException(
+                        "Ya existe un producto activo llamado '" + p.getNombre() + "'."); });
+
+        Producto producto = new Producto();
+        aplicar(producto, datos);
+        return ProductoResponse.desde(productoRepo.save(producto));
+    }
+
+    @Transactional
+    public ProductoResponse actualizar(Long id, ProductoRequest datos) {
+        Producto producto = productoRepo.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado."));
+        aplicar(producto, datos);
+        return ProductoResponse.desde(producto);
+    }
+
+    /**
+     * RF-11: baja LOGICA. Un producto con movimientos historicos no se
+     * elimina: dejaria movimientos huerfanos y rompería la trazabilidad.
+     */
+    @Transactional
+    public ProductoResponse cambiarEstado(Long id, boolean activo) {
+        Producto producto = productoRepo.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado."));
+        if (!activo && producto.getStockActual() > 0) {
+            throw new ReglaNegocioException(
+                "El producto aun tiene " + producto.getStockActual()
+                + " unidades en existencia. Registre la salida antes de descontinuarlo.");
+        }
+        producto.setActivo(activo);
+        return ProductoResponse.desde(producto);
+    }
+
+    /** RNF-10: historial de movimientos de un producto. */
+    public List<MovimientoResponse> movimientosDe(Long productoId) {
+        if (!productoRepo.existsById(productoId)) {
+            throw new RecursoNoEncontradoException("Producto no encontrado.");
+        }
+        return movimientoRepo.findByProductoIdOrderByFechaDesc(productoId)
+                .stream().map(MovimientoResponse::desde).toList();
+    }
+
+    private void aplicar(Producto producto, ProductoRequest datos) {
+        producto.setNombre(datos.nombre().trim());
+        producto.setCategoria(datos.categoria().trim().toUpperCase());
+        producto.setDescripcion(datos.descripcion());
+        producto.setPrecio(datos.precio());
+        producto.setStockMinimo(datos.stockMinimo());
     }
 
     @Transactional

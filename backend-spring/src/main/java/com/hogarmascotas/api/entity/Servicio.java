@@ -52,6 +52,13 @@ public abstract class Servicio {
      */
     public abstract boolean puedeSerAtendidoPor(Empleado empleado);
 
+    /**
+     * POLIMORFISMO (RF-09): cada subtipo declara si su atencion genera
+     * historia clinica. Evita que la capa de servicio pregunte por el
+     * tipo: un bano no produce diagnostico, una consulta si.
+     */
+    public abstract boolean requiereHistorialClinico();
+
     public Long getId() { return id; }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

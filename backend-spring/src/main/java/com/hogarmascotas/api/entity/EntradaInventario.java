@@ -19,4 +19,7 @@ public class EntradaInventario extends MovimientoInventario {
 
     public String getProveedor() { return proveedor; }
     public void setProveedor(String proveedor) { this.proveedor = proveedor; }
+
+    @Override
+    public String getTipo() { return "ENTRADA"; }
 }
